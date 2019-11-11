@@ -1,0 +1,5 @@
+( hubble AND ( telescope NOT space ) )
+( ( iran OR africa ) NOT ( sanctions OR support ) )  
+( iran AND israel )
+( ( south NOT african ) NOT sanctions )
+( technion OR haifa )
