@@ -126,6 +126,7 @@ class DocumentsFile(object):
 
     @staticmethod
     def tokenize(text):
+        # TODO: should we do more tokenization?
         tokenized_text = text.strip()
         tokenized_text = tokenized_text.replace('\n', ' ')
         return tokenized_text
