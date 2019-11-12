@@ -39,12 +39,12 @@ def main():
     if args.queries_file and inverted_index and args.queries_result_file:
         queries_results = boolean_retrieval(inverted_index, args.queries_file)
         with open(args.queries_result_file, 'w') as file:
-            file.write(queries_results)
+            file.write('\n'.join(queries_results))
 
     # print hw part 3 answers
     if args.part_three_answers and inverted_index:
-        print('max df: {}'.format(inverted_index.get_max_df()))
-        print('min df: {}'.format(inverted_index.get_min_df()))
+        # TODO: Write the top 10 terms with the highest document frequency
+        # TODO: Write the top 10 terms with the lowest document frequency
         # TODO: Explain the different characteristics of the above two sets of terms
         print('The different characteristics of the above two sets of terms:')
         print('maxdf is the most common term in the collection, located in large number of documents')

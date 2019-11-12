@@ -1,55 +1,34 @@
 
-def evaluate(inverted_index, query_elements):
-    # TODO: verify assumption that 'A NOT B' means 'A AND NOT B'
+def boolean_retrieval(inverted_index):
+    queries_results = []
 
-    element = query_elements[0]
+    # (hubble AND ( telescope NOT space) )
+    hubble_pl = inverted_index.get_postlist('hubble').get_docno_set()
+    telescope_pl = inverted_index.get_postlist('telescope').get_docno_set()
+    space_pl = inverted_index.get_postlist('space').get_docno_set()
+    queries_results.append(hubble_pl.intersection(telescope_pl.difference(space_pl)))
 
-    if element == '(':
-        return evaluate(inverted_index, query_elements[1:])
+    # ((iran OR africa) NOT ( sanctions OR support) )
+    iran_pl = inverted_index.get_postlist('iran').get_docno_set()
+    africa_pl = inverted_index.get_postlist('africa').get_docno_set()
+    sanctions_pl = inverted_index.get_postlist('sanctions').get_docno_set()
+    support_pl = inverted_index.get_postlist('support').get_docno_set()
+    queries_results.append(iran_pl.union(africa_pl).intersection(sanctions_pl.union(support_pl)))
 
-    if element not in ['(', ')']:
-        # get left postlist        
-        postlist_l = inverted_index.get_postlist(element)
-        if postlist_l is None: return None
-        postlist_l = postlist_l.get_docno_set()
+    # (iran AND israel)
+    iran_pl = inverted_index.get_postlist('iran').get_docno_set()
+    israel_pl = inverted_index.get_postlist('israel').get_docno_set()
+    queries_results.append(iran_pl.intersection(israel_pl))
 
-        # get operator
-        operator = query_elements[1]
-        if operator not in ['AND', 'OR', 'NOT']: return None
+    # ((south NOT african) NOT sanctions)
+    south_pl = inverted_index.get_postlist('south').get_docno_set()
+    african_pl = inverted_index.get_postlist('african').get_docno_set()
+    sanctions_pl = inverted_index.get_postlist('sanctions').get_docno_set()
+    queries_results.append(south_pl.difference(african_pl).difference(sanctions_pl))
 
-        # get right postlist
-        right_element = query_elements[2]
-        if right_element == '(':
-            postlist_r = evaluate(inverted_index, query_elements[2:])
-        else:
-            postlist_r = inverted_index.get_postlist(right_element)
-            if postlist_r is None: return None
-            postlist_r = postlist_r.get_docno_set()
+    # (technion OR haifa)
+    technion_pl = inverted_index.get_postlist('technion').get_docno_set()
+    haifa_pl = inverted_index.get_postlist('haifa').get_docno_set()
+    queries_results.append(technion_pl.union(haifa_pl))
 
-        if operator == 'AND':
-            return postlist_l.intersection(postlist_r)
-        if operator == 'OR':
-            return postlist_l.union(postlist_r)
-        if operator == 'NOT':
-            return postlist_l.difference(postlist_r)
-
-
-def boolean_retrieval(inverted_index, queries_file):
-    queries_results = ''
-
-    with open(queries_file, 'r') as file:
-        queries = file.readlines()
-
-    ######################################
-    # DEBUG - work on few files
-    # if DEBUG: del queries[1:]
-    # queries = ['( than AND ( years NOT report ) )']
-    ######################################
-
-    for query in queries:
-        results = evaluate(inverted_index, query.strip().split(' '))
-        if results:
-            results = ' '.join(results)
-        else:
-            results = 'NA'
-        queries_results += '{}\n'.format(results)
+    return [' '.join(x) for x in queries_results]

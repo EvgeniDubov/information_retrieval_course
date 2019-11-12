@@ -50,6 +50,13 @@ class InvertedIndex(object):
         if term not in self.index: return None
         return self.index[term].posting_list
 
+    def merge(self, new_index):
+        for k, v in new_index.index.items():
+            if k not in self.index:
+                self.index[k] = v
+            else:
+                self.index[k].merge(v)
+
 
 class IndexEntry(object):
 
@@ -64,6 +71,10 @@ class IndexEntry(object):
         if not self.posting_list.contains(docid):
             self.df += 1
             self.posting_list.add_doc(docid, docno)
+
+    def merge(self, new_entry):
+        self.df += new_entry.df
+        self.posting_list.merge(new_entry.posting_list)
 
 
 class PostingList(object):
@@ -113,6 +124,14 @@ class PostingList(object):
 
         return docno_set
 
+    def merge(self, new_posting_list):
+        if self.head.docid > new_posting_list.last.docid:
+            new_posting_list.last.next_post = self.head
+            self.head = new_posting_list.head
+        else:
+            self.last.next_post = new_posting_list.head
+            self.last = new_posting_list.last
+
 
 class Post(object):
 
@@ -161,6 +180,7 @@ class DocumentsFile(object):
             texts = doc.split('<TEXT>')
             del texts[0]  # first element is the everything before the text
             doc_text = ''
+            # TODO: replace with ' '.join(texts
             for text in texts:
                 doc_text = '{} {}'.format(doc_text, DocumentsFile.tokenize(text.split('</TEXT>')[0].strip()))
 
