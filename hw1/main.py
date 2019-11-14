@@ -9,10 +9,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--documents_folder', action='store')
     parser.add_argument('-o', '--index_output_file', action='store')
-    parser.add_argument('-i', '--index_input_file', action='store')
-    parser.add_argument('-q', '--queries_file', action='store')
+    parser.add_argument('-c', '--docid_map_output_file', action='store')
+    parser.add_argument('-i', '--index_file', action='store')
+    parser.add_argument('-b', '--docid_map_file', action='store')
+    parser.add_argument('-q', '--evaluate_queries', action='store_true')
     parser.add_argument('-a', '--queries_result_file', action='store')
-    parser.add_argument('-p', '--part_three_answers', action='store')
+    parser.add_argument('-p', '--part_three_file', action='store')
 
     # parse parameters
     args = parser.parse_args()
@@ -26,29 +28,47 @@ def main():
     if args.documents_folder is not None:
         inverted_index = build_inverted_index(args.documents_folder)
 
-        # export inverted index to a file if request
-        if args.index_output_file is not None:
-            with open(args.index_output_file, 'w') as file:
-                file.write(str(inverted_index))
+        # export inverted index to a file if requested
+        if args.index_output_file is not None and args.docid_map_output_file is not None:
+            inverted_index.index_to_file(args.index_output_file)
+            inverted_index.docidmap_to_file(args.docid_map_output_file)
 
     # load inverted index from file
-    if args.index_input_file is not None:
-        inverted_index = InvertedIndex(args.index_input_file)
+    if args.index_file is not None and args.docid_map_file:
+        inverted_index = InvertedIndex(args.index_file, args.docid_map_file)
 
     # run queries
-    if args.queries_file and inverted_index and args.queries_result_file:
-        queries_results = boolean_retrieval(inverted_index, args.queries_file)
+    if args.evaluate_queries and inverted_index and args.queries_result_file:
+        queries_results = boolean_retrieval(inverted_index)
         with open(args.queries_result_file, 'w') as file:
             file.write('\n'.join(queries_results))
 
     # print hw part 3 answers
-    if args.part_three_answers and inverted_index:
+    if args.part_three_file and inverted_index:
+        answer = ''
+        top = 10
+        bottom = 10
+
         # TODO: Write the top 10 terms with the highest document frequency
+        top_df = inverted_index.get_top_df_ids(top)
+        answer += '--------------------------------------\n'
+        answer += 'Top {} df terms:\n'.format(top)
+        answer += '\n'.join(['{}: {}'.format(term, df) for term, df in top_df])
+
         # TODO: Write the top 10 terms with the lowest document frequency
+        bottom_df = inverted_index.get_bottom_df_ids(bottom)
+        answer += '\n--------------------------------------\n'
+        answer += 'Bottom {} df terms:\n'.format(bottom)
+        answer += '\n'.join(['{}: {}'.format(term, df) for term, df in bottom_df])
+
         # TODO: Explain the different characteristics of the above two sets of terms
-        print('The different characteristics of the above two sets of terms:')
-        print('maxdf is the most common term in the collection, located in large number of documents')
-        print('mindf is the rarest term in the collection, located only in few documents')
+        answer += '\n--------------------------------------\n'
+        answer += 'The different characteristics of the above two sets of terms:\n'
+        answer += '   Top dfs terms are the most common terms in the collection, located in large number of documents\n'
+        answer += '   Bottom dfs terms are the rarest terms in the collection, located only in few documents\n'
+
+        with open(args.part_three_file, 'w') as file:
+            file.write(answer)
 
 
 if __name__ == '__main__':

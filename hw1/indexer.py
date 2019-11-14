@@ -1,28 +1,32 @@
 from os import listdir, path
-
+import gc
+import operator
 
 class InvertedIndex(object):
 
-    def __str__(self):
-        return '\n'.join(["'{}'{}".format(k, str(v)) for k, v in self.index.items()])
-
-    def __init__(self, inverted_index_file=''):
+    def __init__(self, inverted_index_file='', docidmap_file=''):
         self.index = {}
         self.docidmap = {}
 
         if inverted_index_file:
             with open(inverted_index_file, 'r') as file:
-                inverted_index_entries = file.readlines()
+                line = file.readline().strip()
+                while line != '':
+                    line_split = line.split(PostingList.separator)
+                    term = line_split[0][1:-1]
+                    entry = IndexEntry(line_split[1:])
+                    self.index[term] = entry
+                    line = file.readline().strip()
+                    gc.collect()
 
-            for entry in inverted_index_entries:
-                post_list = entry.split(' -> ')
-                term = post_list[0][1:-1]
-                for post in post_list[1:]:
-                    post_details = post.split(' ')
-                    docid = int(post_details[0])
-                    docno = post_details[1][1:-1]
+        if docidmap_file:
+            with open(docidmap_file, 'r') as file:
+                docidmap = file.readlines()
+                for doc in docidmap:
+                    docid = doc.split(' ')[0].strip()
+                    docno = doc.split(' ')[1].strip()
                     self.docidmap[docid] = docno
-                    self.update_term(term, docid, docno)
+
 
     def get_max_df(self):
         return max([v.df for k, v in self.index.items()])
@@ -36,19 +40,19 @@ class InvertedIndex(object):
         for term in terms:
             term = term.strip()
             if term == '': continue
-            self.update_term(term, doc.id, doc.name)
+            self.update_term(term, doc.id)
 
     def get_doc_name(self, docid):
         return self.docidmap[docid]
 
-    def update_term(self, term, docid, docno):
+    def update_term(self, term, docid):
         if term not in self.index:
-            self.index[term] = IndexEntry()
-        self.index[term].add_doc(docid, docno)
+            self.index[term] = IndexEntry([docid])
+        else: self.index[term].add_doc(docid)
 
     def get_postlist(self, term):
         if term not in self.index: return None
-        return self.index[term].posting_list
+        return self.index[term].posting_list.get_docid_set()
 
     def merge(self, new_index):
         for k, v in new_index.index.items():
@@ -57,20 +61,37 @@ class InvertedIndex(object):
             else:
                 self.index[k].merge(v)
 
+    def get_top_df_ids(self, top):
+        return sorted({k: v.df for k, v in self.index.items()}.items(), key=operator.itemgetter(1))[(-1)*top:]
+
+    def get_bottom_df_ids(self, bottom):
+        return sorted({k: v.df for k, v in self.index.items()}.items(), key=operator.itemgetter(1))[:bottom]
+
+    def index_to_file(self, file_name):
+        with open(file_name, 'w') as file:
+            for k, v in self.index.items():
+                file.write("'{}'{}{}\n".format(k, PostingList.separator, str(v)))
+                file.flush()
+
+    def docidmap_to_file(self, file_name):
+        with open(file_name, 'w') as file:
+            for k, v in self.docidmap.items():
+                file.write("{} {}\n".format(k, v))
+
 
 class IndexEntry(object):
 
     def __str__(self):
         return str(self.posting_list)
 
-    def __init__(self):
-        self.df = 0
-        self.posting_list = PostingList()
+    def __init__(self, docids):
+        self.df = len(docids)
+        self.posting_list = PostingList(docids)
 
-    def add_doc(self, docid, docno):
+    def add_doc(self, docid):
         if not self.posting_list.contains(docid):
             self.df += 1
-            self.posting_list.add_doc(docid, docno)
+            self.posting_list.add_doc(docid)
 
     def merge(self, new_entry):
         self.df += new_entry.df
@@ -79,66 +100,29 @@ class IndexEntry(object):
 
 class PostingList(object):
 
+    separator = '->'
+
     def __str__(self):
-        post_list_str = ''
+        return PostingList.separator.join([str(x) for x in self.postlist])
 
-        iterator = self.head
-        while iterator is not None:
-            post_list_str += ' -> {} ({})'.format(iterator.docid,
-                                                  iterator.docno)
-            iterator = iterator.next_post
+    def __init__(self, docids):
+        self.postlist = docids
 
-        return post_list_str
-
-    def __init__(self):
-        self.head = None
-        self.last = None
-
-    def add_doc(self, docid, docno):
-        post = Post(docid, docno, None)
-
-        # TODO: fix this ugly code part
-        if self.head is None:
-            self.head = self.last = post
-        else:
-            self.last.next_post = post
-            self.last = post
+    def add_doc(self, docid):
+        self.postlist.append(docid)
 
     def contains(self, docid):
-        contains = False
-        iterator = self.head
-        while iterator is not None:
-            if iterator.docid == docid:
-                contains = True
-                break
-            iterator = iterator.next_post
+        return self.postlist[-1] == docid
 
-        return contains
-
-    def get_docno_set(self):
-        docno_set = set()
-        iterator = self.head
-        while iterator is not None:
-            docno_set.add(iterator.docno)
-            iterator = iterator.next_post
-
-        return docno_set
+    def get_docid_set(self):
+        return set(self.postlist)
 
     def merge(self, new_posting_list):
-        if self.head.docid > new_posting_list.last.docid:
-            new_posting_list.last.next_post = self.head
-            self.head = new_posting_list.head
+        if self.postlist[-1] < new_posting_list[0]:
+            self.postlist.extend(new_posting_list)
         else:
-            self.last.next_post = new_posting_list.head
-            self.last = new_posting_list.last
-
-
-class Post(object):
-
-    def __init__(self, docid, docno, next_post):
-        self.docid = docid
-        self.docno = docno
-        self.next_post = next_post
+            new_posting_list.extend(self.postlist)
+            self.postlist = new_posting_list
 
 
 class DocumentsFile(object):
@@ -180,7 +164,7 @@ class DocumentsFile(object):
             texts = doc.split('<TEXT>')
             del texts[0]  # first element is the everything before the text
             doc_text = ''
-            # TODO: replace with ' '.join(texts
+            # TODO: replace with ' '.join(texts)
             for text in texts:
                 doc_text = '{} {}'.format(doc_text, DocumentsFile.tokenize(text.split('</TEXT>')[0].strip()))
 

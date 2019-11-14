@@ -3,32 +3,47 @@ def boolean_retrieval(inverted_index):
     queries_results = []
 
     # (hubble AND ( telescope NOT space) )
-    hubble_pl = inverted_index.get_postlist('hubble').get_docno_set()
-    telescope_pl = inverted_index.get_postlist('telescope').get_docno_set()
-    space_pl = inverted_index.get_postlist('space').get_docno_set()
-    queries_results.append(hubble_pl.intersection(telescope_pl.difference(space_pl)))
+    hubble_pl = inverted_index.get_postlist('hubble')
+    telescope_pl = inverted_index.get_postlist('telescope')
+    space_pl = inverted_index.get_postlist('space')
+    if hubble_pl and telescope_pl and space_pl:
+        queries_results.append(hubble_pl.intersection(telescope_pl.difference(space_pl)))
+    else:
+        queries_results.append(set())
 
     # ((iran OR africa) NOT ( sanctions OR support) )
-    iran_pl = inverted_index.get_postlist('iran').get_docno_set()
-    africa_pl = inverted_index.get_postlist('africa').get_docno_set()
-    sanctions_pl = inverted_index.get_postlist('sanctions').get_docno_set()
-    support_pl = inverted_index.get_postlist('support').get_docno_set()
-    queries_results.append(iran_pl.union(africa_pl).intersection(sanctions_pl.union(support_pl)))
+    iran_pl = inverted_index.get_postlist('iran')
+    africa_pl = inverted_index.get_postlist('africa')
+    sanctions_pl = inverted_index.get_postlist('sanctions')
+    support_pl = inverted_index.get_postlist('support')
+    if iran_pl and africa_pl and sanctions_pl and support_pl:
+        queries_results.append(iran_pl.union(africa_pl).intersection(sanctions_pl.union(support_pl)))
+    else:
+        queries_results.append(set())
 
     # (iran AND israel)
-    iran_pl = inverted_index.get_postlist('iran').get_docno_set()
-    israel_pl = inverted_index.get_postlist('israel').get_docno_set()
-    queries_results.append(iran_pl.intersection(israel_pl))
+    iran_pl = inverted_index.get_postlist('iran')
+    israel_pl = inverted_index.get_postlist('israel')
+    if iran_pl and israel_pl:
+        queries_results.append(iran_pl.intersection(israel_pl))
+    else:
+        queries_results.append(set())
 
     # ((south NOT african) NOT sanctions)
-    south_pl = inverted_index.get_postlist('south').get_docno_set()
-    african_pl = inverted_index.get_postlist('african').get_docno_set()
-    sanctions_pl = inverted_index.get_postlist('sanctions').get_docno_set()
-    queries_results.append(south_pl.difference(african_pl).difference(sanctions_pl))
+    south_pl = inverted_index.get_postlist('south')
+    african_pl = inverted_index.get_postlist('african')
+    sanctions_pl = inverted_index.get_postlist('sanctions')
+    if south_pl and african_pl and sanctions_pl:
+        queries_results.append(south_pl.difference(african_pl).difference(sanctions_pl))
+    else:
+        queries_results.append(set())
 
     # (technion OR haifa)
-    technion_pl = inverted_index.get_postlist('technion').get_docno_set()
-    haifa_pl = inverted_index.get_postlist('haifa').get_docno_set()
-    queries_results.append(technion_pl.union(haifa_pl))
+    technion_pl = inverted_index.get_postlist('technion')
+    haifa_pl = inverted_index.get_postlist('haifa')
+    if technion_pl and haifa_pl:
+        queries_results.append(technion_pl.union(haifa_pl))
+    else:
+        queries_results.append(set())
 
-    return [' '.join(x) for x in queries_results]
+    return [' '.join([inverted_index.docidmap[i].strip() for i in x]) for x in queries_results]
