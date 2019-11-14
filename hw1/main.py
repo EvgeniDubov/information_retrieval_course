@@ -5,7 +5,7 @@ from evaluator import boolean_retrieval
 
 
 def main():
-    # define parameters
+    # define command line parameters
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--documents_folder', action='store')
     parser.add_argument('-o', '--index_output_file', action='store')
@@ -16,7 +16,7 @@ def main():
     parser.add_argument('-a', '--queries_result_file', action='store')
     parser.add_argument('-p', '--part_three_file', action='store')
 
-    # parse parameters
+    # parse command line parameters
     args = parser.parse_args()
     print('received the following arguments')
     for k, v in vars(args).items():
@@ -37,35 +37,38 @@ def main():
     if args.index_file is not None and args.docid_map_file:
         inverted_index = InvertedIndex(args.index_file, args.docid_map_file)
 
-    # run queries
+    # write queries results to a file
     if args.evaluate_queries and inverted_index and args.queries_result_file:
         queries_results = boolean_retrieval(inverted_index)
         with open(args.queries_result_file, 'w') as file:
             file.write('\n'.join(queries_results))
 
-    # print hw part 3 answers
+    # write hw part 3 answers to a file
     if args.part_three_file and inverted_index:
         answer = ''
         top = 10
         bottom = 10
 
-        # TODO: Write the top 10 terms with the highest document frequency
+        # Write the top 10 terms with the highest document frequency
         top_df = inverted_index.get_top_df_ids(top)
         answer += '--------------------------------------\n'
         answer += 'Top {} df terms:\n'.format(top)
         answer += '\n'.join(['{}: {}'.format(term, df) for term, df in top_df])
 
-        # TODO: Write the top 10 terms with the lowest document frequency
+        # Write the top 10 terms with the lowest document frequency
         bottom_df = inverted_index.get_bottom_df_ids(bottom)
         answer += '\n--------------------------------------\n'
         answer += 'Bottom {} df terms:\n'.format(bottom)
         answer += '\n'.join(['{}: {}'.format(term, df) for term, df in bottom_df])
 
-        # TODO: Explain the different characteristics of the above two sets of terms
+        # Explain the different characteristics of the above two sets of terms
         answer += '\n--------------------------------------\n'
         answer += 'The different characteristics of the above two sets of terms:\n'
         answer += '   Top dfs terms are the most common terms in the collection, located in large number of documents\n'
         answer += '   Bottom dfs terms are the rarest terms in the collection, located only in few documents\n'
+        answer += '   * in our inverted index we don\'t keep track of terms frequency inside a document, ' \
+                  'meaning df of a term signifies the number of documents in which this term was present' \
+                  ' at least one time\n'
 
         with open(args.part_three_file, 'w') as file:
             file.write(answer)
