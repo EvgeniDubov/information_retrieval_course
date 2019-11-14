@@ -1,0 +1,29 @@
+--------------------------------------
+Top 10 df terms:
+that: 204381
+on: 213235
+said: 218301
+for: 219079
+to: 235720
+and: 236670
+a: 236963
+in: 236964
+of: 238932
+the: 242067
+--------------------------------------
+Bottom 10 df terms:
+australiavietnam: 1
+radelats: 1
+detered: 1
+wettre: 1
+nspca: 1
+toralf: 1
+metveit: 1
+283031: 1
+weekwas: 1
+bophuthatswanas: 1
+--------------------------------------
+The different characteristics of the above two sets of terms:
+   Top dfs terms are the most common terms in the collection, located in large number of documents
+   Bottom dfs terms are the rarest terms in the collection, located only in few documents
+   * in our inverted index we don't keep track of terms frequency inside a document, meaning df of a term signifies the number of documents in which this term was present at least one time

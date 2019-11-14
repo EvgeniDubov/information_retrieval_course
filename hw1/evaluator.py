@@ -1,5 +1,5 @@
 
-def boolean_retrieval(inverted_index):
+def BooleanRetrieval(inverted_index):
     queries_results = []
 
     # (hubble AND ( telescope NOT space) )

@@ -1,7 +1,7 @@
 import argparse
 from indexer import build_inverted_index
 from indexer import InvertedIndex
-from evaluator import boolean_retrieval
+from evaluator import BooleanRetrieval
 
 
 def main():
@@ -39,7 +39,7 @@ def main():
 
     # write queries results to a file
     if args.evaluate_queries and inverted_index and args.queries_result_file:
-        queries_results = boolean_retrieval(inverted_index)
+        queries_results = BooleanRetrieval(inverted_index)
         with open(args.queries_result_file, 'w') as file:
             file.write('\n'.join(queries_results))
 
