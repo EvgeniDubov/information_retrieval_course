@@ -1,0 +1,16 @@
+<parameters>
+	<memory>1G</memory>
+	<corpus>
+		<!-- SERVER 
+		<path>/data/HW2/WET_PART_A/docs.txt</path> 
+		-->
+		<!-- LOCAL -->
+		<path>C:\Users\edubov\Desktop\o\home\Technion\2019W - 096262 - אחזור מידע\hw\hw2\WET_PART_A\docs.txt</path> 
+		<class>trectext</class>
+	</corpus>
+	<!-- SERVER 
+	<index>/home/student/hw2/part_A/index</index>
+	-->
+	<!-- LOCAL -->	
+	<index>C:\Users\edubov\Desktop\o\home\Technion\2019W - 096262 - אחזור מידע\hw\hw2\WET_PART_A\index</index>
+</parameters>
