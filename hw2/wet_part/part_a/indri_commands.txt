@@ -1,6 +1,19 @@
 Part A
-- Create index
+
+- Indexing
 [student@ir2019w-0021 indri-5.8]$ /home/student/indri-5.8/buildindex/IndriBuildIndex ./../hw2/part_A/parameters.xml
 
+- Retrieveal
+1.	> indrirunquery retrieval_parameters.xml -query=corporation
+0 Q0 D2 1 0.760648 indri
 
+2.	> del index 
+	> IndriBuildIndex indexing_parameters.xml -stemmer.name=porter
+	> indrirunquery retrieval_parameters.xml -query=corporation
+0 Q0 D2 1 0.252117 indri
+0 Q0 D3 2 0.239987 indri
+3.>
 
+4.>
+
+5.>

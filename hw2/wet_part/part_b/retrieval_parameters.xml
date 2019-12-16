@@ -1,0 +1,6 @@
+<parameters>
+	<memory>1G</memory>	
+	<count>1000</count>
+	<trecFormat>true</trecFormat>
+	<baseline>tfidf,k1:1.0,b:0.3</baseline>
+</parameters>
