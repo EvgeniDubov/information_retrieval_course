@@ -12,3 +12,14 @@
 .ipynb_checkpoints
 /IR_chalenge/ROBUSTindex
 /IR_chalenge/IR_Challenge.pdf
+/IR_chalenge/trec_eval-9.0.7
+/hw2/wet_part/part_b/index_*
+/hw2/wet_part/part_b/trec_eval-9.0.7
+/hw2/wet_part/part_b/run_indexing_*
+/hw2/wet_part/part_b/query_res_*
+/hw2/wet_part/part_b/parameters*
+/hw2/wet_part/part_b/indexing_*
+/hw2/wet_part/part_b/eval_*
+
+
+

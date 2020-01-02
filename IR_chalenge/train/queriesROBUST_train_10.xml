@@ -1,0 +1,42 @@
+<parameters>
+	<query>
+		<number>301</number>
+		<text>#combine( international organized crime )</text>
+	</query>
+	<query>
+		<number>302</number>
+		<text>#combine( poliomyelitis post polio )</text>
+	</query>
+	<query>
+		<number>303</number>
+		<text>#combine( hubble telescope achievements )</text>
+	</query>
+	<query>
+		<number>304</number>
+		<text>#combine( endangered species mammals )</text>
+	</query>
+	<query>
+		<number>305</number>
+		<text>#combine( dangerous vehicles )</text>
+	</query>
+	<query>
+		<number>306</number>
+		<text>#combine( african civilian deaths )</text>
+	</query>
+	<query>
+		<number>307</number>
+		<text>#combine( new hydroelectric projects )</text>
+	</query>
+	<query>
+		<number>308</number>
+		<text>#combine( implant dentistry )</text>
+	</query>
+	<query>
+		<number>309</number>
+		<text>#combine( rap crime )</text>
+	</query>
+	<query>
+		<number>310</number>
+		<text>#combine( radio waves brain cancer )</text>
+	</query>
+</parameters>

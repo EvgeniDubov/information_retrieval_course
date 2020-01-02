@@ -1,0 +1,22 @@
+<parameters>
+	<query>
+		<number>301</number>
+		<text>#combine( international organized crime )</text>
+	</query>
+	<query>
+		<number>302</number>
+		<text>#combine( poliomyelitis post polio )</text>
+	</query>
+	<query>
+		<number>303</number>
+		<text>#combine( hubble telescope achievements )</text>
+	</query>
+	<query>
+		<number>304</number>
+		<text>#combine( endangered species mammals )</text>
+	</query>
+	<query>
+		<number>305</number>
+		<text>#combine( dangerous vehicles )</text>
+	</query>
+</parameters>
